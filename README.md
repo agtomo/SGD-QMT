@@ -2,5 +2,5 @@
 This repository contains the code to implement quantum measurement tomography using stochastic gradient descent (SGD-QMT). 
 
 
-The code is based on the paper xxxxx
+The code is based on the paper https://arxiv.org/abs/2511.15682
 
