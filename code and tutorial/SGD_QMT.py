@@ -18,7 +18,7 @@ from jax.scipy.special import gammaln
 paulis = {
     "I": jnp.array([[1,0],[0,1]], dtype=jnp.complex64),
     "X": jnp.array([[0,1],[1,0]], dtype=jnp.complex64),
-    # "Y": jnp.array([[0,-1j],[1j,0]], dtype=jnp.complex64),
+    "Y": jnp.array([[0,-1j],[1j,0]], dtype=jnp.complex64),
     "Z": jnp.array([[1,0],[0,-1]], dtype=jnp.complex64),
 }
 
@@ -469,29 +469,29 @@ def Run_HonestQMT_StatePovmBatched(
     return recon_povms, final_probs, losses, times, recon_povms_step, total_time
 
 
-def Stiefel_ansatz(rank, dim, num_povms, seed=None):
-    # Generate rectangular random matrices
-    if seed is None:
-        seed = int(time.time_ns() % (2**32))
-    print(f"Seed value for initial guess for Run_StiefelManiQMT_StatePovmBatched: {seed}")
-    key_params = jax.random.PRNGKey(seed)
+# def Stiefel_ansatz(rank, dim, num_povms, seed=None):
+#     # Generate rectangular random matrices
+#     if seed is None:
+#         seed = int(time.time_ns() % (2**32))
+#     print(f"Seed value for initial guess for Run_StiefelManiQMT_StatePovmBatched: {seed}")
+#     key_params = jax.random.PRNGKey(seed)
 
-    keys = jax.random.split(key_params, num_povms)
+#     keys = jax.random.split(key_params, num_povms)
     
-    T = [jax.random.normal(k, (rank, dim)) for k in keys]
+#     T = [jax.random.normal(k, (rank, dim)) for k in keys]
 
-    # Make PSD matrices
-    unnormalized = jnp.stack([make_psd(L) for L in T])  # (num_povms, dim, dim)
+#     # Make PSD matrices
+#     unnormalized = jnp.stack([make_psd(L) for L in T])  # (num_povms, dim, dim)
 
-    # Normalize: enforce ∑ E_i = I
-    S = jnp.sum(unnormalized, axis=0)  # (dim, dim)
-    eigvals, eigvecs = jnp.linalg.eigh(S)
-    eigvals = jnp.clip(jnp.real(eigvals), 1e-6, None)
-    D_inv_sqrt = jnp.diag(1.0 / jnp.sqrt(eigvals))
-    S_inv_sqrt = eigvecs @ D_inv_sqrt @ eigvecs.T.conj()
+#     # Normalize: enforce ∑ E_i = I
+#     S = jnp.sum(unnormalized, axis=0)  # (dim, dim)
+#     eigvals, eigvecs = jnp.linalg.eigh(S)
+#     eigvals = jnp.clip(jnp.real(eigvals), 1e-6, None)
+#     D_inv_sqrt = jnp.diag(1.0 / jnp.sqrt(eigvals))
+#     S_inv_sqrt = eigvecs @ D_inv_sqrt @ eigvecs.T.conj()
 
-    ansatz = jnp.array([E @ S_inv_sqrt for E in T])
-    return ansatz 
+#     ansatz = jnp.array([E @ S_inv_sqrt for E in T])
+#     return ansatz 
 
 
 
@@ -534,9 +534,9 @@ def Run_StiefelManiQMT_StatePovmBatched(dimension, num_povms, rank, state_batch_
         seed = int(time.time_ns() % (2**32))
 
     # initializing with valid ansatz
-    # params = jnp.array([rand_unitary(dim, density=0.5).full()/np.sqrt(num_povms) for w in range(num_povms)])
+    params = jnp.array([rand_unitary(dim, density=0.5).full()/np.sqrt(num_povms) for w in range(num_povms)])
 
-    params = Stiefel_ansatz(rank, dim, num_povms, seed=None)
+    # params = Stiefel_ansatz(rank, dim, num_povms, seed=None)
     params = get_block(params)
 
     @jax.jit
